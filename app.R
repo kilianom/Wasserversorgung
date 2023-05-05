@@ -45,7 +45,7 @@ ui <- fluidPage(theme = theme_a,tags$head(tags$style('
        wellPanel(   id="box1", 
             fluidRow(
               column(width=4,
-              h4("Einabe Tränken und Parzellen")),
+              h4("Eingabe Tränken und Parzellen")),
               column(width=1,
                      
              actionButton("help","",icon = icon("circle-question","fa-1x")),
@@ -73,7 +73,9 @@ br(),
 downloadButton("downloadData", "Karte als Bild herunterladen")
 
 )
-)
+),
+fluidRow(column(width = 12,offset = 11 ,tags$a("Datenschutzerklärung", href="datenschutz.html",target="_blank",style = "font-size: 80%;color: #000000 ;margin-top=0px;"))),        
+
 )
 ###########################################server#################################################
 server <- function(input, output,session) {
