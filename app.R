@@ -24,7 +24,7 @@ ui <- fluidPage(theme = theme_a,tags$head(tags$style('
     fluidRow(
       column(width = 5,"Wasserversorgung Weide"),
      
-      column(width= 1,offset = 1,actionButton("help1","Information", onclick ="window.open(' helper/Manual_Wasserversorgung.html','_blank')",icon = icon("question"))),
+      column(width= 1,offset = 6,actionButton("help1","Information", onclick ="window.open(' helper/Manual_Wasserversorgung.html','_blank')",icon = icon("question"))),
       # column(width=12,offset = 11,
       #        tags$a(href="https://www.mud-tierschutz.de/mud-tierschutz/wissen-dialog-praxis/milchkuehe/weidehaltung-von-milchkuehen",target="blank",
       #        tags$style(".topimg {
@@ -34,21 +34,23 @@ ui <- fluidPage(theme = theme_a,tags$head(tags$style('
       #                       }"),
       #        div(class="topimg",img(src='BLElogo.png', align = "top",width="10%")),
       #        ))
-    ),
+   
+      ),
     windowTitle = "Wasserversorgung" ),
  
 
-  mainPanel(
+  mainPanel(width = 12,
       tags$style(type = "text/css", "html, body {width:100%; height:100%}"),
   
-    column(width = 11,
+    column(width = 9,
        wellPanel(   id="box1", 
             fluidRow(
-              column(width=4,
+              column(width=11,
               h4("Eingabe Tränken und Parzellen")),
               column(width=1,
-                     
-             actionButton("help","",icon = icon("circle-question","fa-1x")),
+             div(     style="float:right",   
+             actionButton("help","",icon = icon("circle-question","fa-1x"))
+             ),
             )),
            
     editModUI("map_a",height = "78vh"),
@@ -62,7 +64,10 @@ wellPanel(id="box2",
  
 
   )),
-column(width = 1,
+column(width = 3,
+div(img(src="Tbutton40.png",width="60%" ),style="float: center"),
+br(),
+br(),
 actionButton(label = "Wasserversorgung zeigen",inputId="buffer",
              style="background-color: #69b62d;border-color: #69b62d;font-weight: bold"),
 br(),
@@ -70,7 +75,8 @@ br(),
 actionButton("save", "Im Browser speichern", icon("save")),
 actionButton("clear", "Browserspeicher entfernen", icon("trash")),
 br(),
-downloadButton("downloadData", "Karte als Bild herunterladen")
+downloadButton("downloadData", "Karte als Bild herunterladen"),
+br()
 
 )
 ),
@@ -83,13 +89,7 @@ server <- function(input, output,session) {
    showModal(modalDialog(size = 'l',##put that in md 
                          title = "Anleitung",
                          fluidRow(
-                           column(width = 12,
-                                  img(src='Hilfe1_Wasserversorgung.png',width="100%"),
-                                  "Im Ansichtsmodus kann die Karte als Bild heruntergeladen werden. 
-                                 Für eine spätere Nutzung können die Eingaben zu Parzellen und Tränken im Browser gespeichert werden.
-                                 Gespeicherte Eingaben können manuell aus dem Browserspeicher entfernt.
-                                 Das Speichern im Browser funktioniert in den meisten aktuellen Browsern. 
-                                 Durch Klick auf 'Bearbeiten' können die Eingaben weiter verändert werden.")),
+                           includeHTML("www/help_wasserversorgung.html")),
                          footer = tagList(modalButton("Verstanden"))
    ))
  })
@@ -97,13 +97,7 @@ server <- function(input, output,session) {
   showModal(modalDialog(size = 'l',##put that in md 
                         title = "Anleitung",
                         fluidRow(
-                          column(width = 12,
-                                 img(src='Hilfe1_Wasserversorgung.png',width="100%"),
-                                 "Im Ansichtsmodus kann die Karte als Bild heruntergeladen werden. 
-                                 Für eine spätere Nutzung können die Eingaben zu Parzellen und Tränken im Browser gespeichert werden.
-                                 Gespeicherte Eingaben können manuell aus dem Browserspeicher entfernt.
-                                 Das Speichern im Browser funktioniert in den meisten aktuellen Browsern. 
-                                 Durch Klick auf 'Bearbeiten' können die Eingaben weiter verändert werden.")),
+                          includeHTML("www/help_wasserversorgung.html")),
                           footer = tagList(modalButton("Verstanden"))
                         ))
 })
