@@ -6,6 +6,7 @@ library(shinydashboard)
 library(bslib)
 library(shinyStore)
 
+
 #####timeout#######
 timeoutSeconds <- 60*10
 
@@ -37,6 +38,8 @@ idleTimer();", timeoutSeconds*1000, timeoutSeconds, timeoutSeconds*1000)
 theme_a<-bs_theme(
    version = 3,
   bootswatch = "readable")
+
+sf_use_s2(T)
 
 ui <- fluidPage(theme = theme_a,tags$head(tags$style('
    body {
@@ -111,16 +114,16 @@ fluidRow(column(width = 12,offset = 11 ,tags$a("Datenschutzerklärung", href="da
 ###########################################server#################################################
 server <- function(input, output,session) {
  observe({
-   showModal(modalDialog(size = 'l',##put that in md 
+   showModal(modalDialog(size = 'l',
                          title = "Anleitung",
                          fluidRow(
                            includeHTML("www/help_wasserversorgung.html")),
                          footer = tagList(modalButton("Verstanden"))
    ))
  })
+
   
 observeEvent(input$timeOut, { 
-    #print(paste0("Session (", session$token, ") timed out at: ", Sys.time()))
     showModal(modalDialog(
       title = "Timeout",
       paste("Die Anwendung wurde durch längere Inaktivität beendet."),
@@ -130,7 +133,7 @@ observeEvent(input$timeOut, {
   })
   
   observeEvent(input$help,{
-  showModal(modalDialog(size = 'l',##put that in md 
+  showModal(modalDialog(size = 'l',
                         title = "Anleitung",
                         fluidRow(
                           includeHTML("www/help_wasserversorgung.html")),
@@ -197,6 +200,7 @@ map_t<-reactive({
                activeColor = "red",
                completedColor = "red",
              localization = "de")
+   
 map<-if(!is.character(isolate(input$store$map_p))&!is.character(isolate(input$store$map_t))){#any(isolate(is.null(input$store$map)))
        map
     }else if(is.character(isolate(input$store$map_p))&!is.character(isolate(input$store$map_t))) {
@@ -226,6 +230,7 @@ edits<-callModule(editMod,leafmap=map,id="map_a",
                   targetLayerId = "editable")
 
 observeEvent(input$buffer,{
+  
   if(any(is.null(edits()$all))){
     shinyalert::shinyalert("Fehlende Eingabe","Bitte existierende Eingabe verändern oder neue Eingabe hinzufügen")
   }  else if(input$buffer[1]%%2==1){
@@ -246,12 +251,10 @@ observeEvent(input$buffer,{
     shinyjs::hide("clear")
   }
   
-  
   geom_r<-edits()$all
   req(geom_r)
   geom<-geom_r[(st_is_valid(geom_r))==T,]
   geom_c<-geom_r[(st_is_valid(geom_r))==F,]
- 
   p<-st_as_sf(geom[which(as.character(st_geometry_type(geom))=="POLYGON"),])
   t<-st_as_sf(geom[which(as.character(st_geometry_type(geom))=="POINT"),])
   
@@ -264,9 +267,13 @@ observeEvent(input$buffer,{
     b<-st_as_sf((do.call(rbind,lapply(1:nrow(t),function(x){
       st_intersection(st_buffer(t[x,],150),p[unlist(st_intersects(t[x,],p)),])
     }))))
-    
 
- 
+#sf_use_s2(F)
+b<-st_transform(b,3857)
+p<-st_transform(p,3857)
+t<-st_transform(t,3857)
+
+  
   if(input$buffer[1]%%2==1){
     w_df<-reactive({data.frame(
         w=st_area(st_union(b))/st_area(st_union(p))*100,
@@ -275,7 +282,8 @@ observeEvent(input$buffer,{
         t=nrow(t)
         )
       })
-    
+
+
     shinyalert::shinyalert(
       title = "Wasserversorgung",
       text =   if(w_df()$w_pn==w_df()$pn){
@@ -286,12 +294,18 @@ observeEvent(input$buffer,{
     type = "info"
     )
   }
+
+    
+    
   req(b)
+  b<-st_transform(b,4326)
+  p<-st_transform(p,4326)
+  t<-st_transform(t,4326)
+  
   if(any(st_is_empty(b)==F)){
     
     bb<-c(st_bbox(p))
     names(bb)<-NULL
-    
       map<-reactive({
         leaflet()%>%
         addTiles(group="Karte")%>%
