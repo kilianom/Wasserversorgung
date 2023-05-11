@@ -6,6 +6,29 @@ library(shinydashboard)
 library(bslib)
 library(shinyStore)
 
+#####timeout#######
+timeoutSeconds <- 60*10
+
+inactivity <- sprintf("function idleTimer() {
+var t = setTimeout(logout, %s);
+window.onmousemove = resetTimer; // catches mouse movements
+window.onmousedown = resetTimer; // catches mouse movements
+window.onclick = resetTimer;     // catches mouse clicks
+window.onscroll = resetTimer;    // catches scrolling
+window.onkeypress = resetTimer;  //catches keyboard actions
+
+function logout() {
+Shiny.setInputValue('timeOut', '%ss')
+}
+
+function resetTimer() {
+clearTimeout(t);
+t = setTimeout(logout, %s);  // time is in milliseconds (1000 is 1 second)
+}
+}
+idleTimer();", timeoutSeconds*1000, timeoutSeconds, timeoutSeconds*1000)
+
+
 #install chromium
 #install webshot2
 # install.packages("devtools")
@@ -18,6 +41,7 @@ theme_a<-bs_theme(
 ui <- fluidPage(theme = theme_a,tags$head(tags$style('
    body {
       font-family: Arial}')),
+  tags$script(inactivity),    #timeout
   shinyjs::useShinyjs(),
   initStore("store","store1"),
     titlePanel(
@@ -93,6 +117,17 @@ server <- function(input, output,session) {
                          footer = tagList(modalButton("Verstanden"))
    ))
  })
+  
+observeEvent(input$timeOut, { 
+    #print(paste0("Session (", session$token, ") timed out at: ", Sys.time()))
+    showModal(modalDialog(
+      title = "Timeout",
+      paste("Die Anwendung wurde nach", input$timeOut, "Inaktivität beendet."),
+      footer = NULL
+    ))
+    session$close()
+  })
+  
   observeEvent(input$help,{
   showModal(modalDialog(size = 'l',##put that in md 
                         title = "Anleitung",
