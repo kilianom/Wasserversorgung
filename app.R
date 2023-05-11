@@ -41,6 +41,7 @@ theme_a<-bs_theme(
 ui <- fluidPage(theme = theme_a,tags$head(tags$style('
    body {
       font-family: Arial}')),
+                
   tags$script(inactivity),    #timeout
   shinyjs::useShinyjs(),
   initStore("store","store1"),
@@ -122,7 +123,7 @@ observeEvent(input$timeOut, {
     #print(paste0("Session (", session$token, ") timed out at: ", Sys.time()))
     showModal(modalDialog(
       title = "Timeout",
-      paste("Die Anwendung wurde nach", input$timeOut, "Inaktivität beendet."),
+      paste("Die Anwendung wurde durch längere Inaktivität beendet."),
       footer = NULL
     ))
     session$close()
