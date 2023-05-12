@@ -44,8 +44,29 @@ sf_use_s2(T)
 ui <- fluidPage(theme = theme_a,tags$head(tags$style('
    body {
       font-family: Arial}')),
+  
                 
   tags$script(inactivity),    #timeout
+  
+  tags$head(tags$style(type="text/css", "
+             #loadmessage {
+               position: fixed;
+               top: 0px;
+               left: 0px;
+               width: 100%;
+               padding: 5px 0px 5px 0px;
+               text-align: center;
+               font-weight: bold;
+               font-size: 100%;
+               color: #000000;
+               background-color: #f5f5f5;
+               z-index: 105;
+             }
+          ")),
+  
+  conditionalPanel(condition="$('html').hasClass('shiny-busy')",
+                   tags$div("Lädt...",id="loadmessage")), 
+  
   shinyjs::useShinyjs(),
   initStore("store","store1"),
     titlePanel(
