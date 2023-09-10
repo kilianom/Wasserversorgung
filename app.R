@@ -5,8 +5,6 @@ library(sf)
 library(shinydashboard)
 library(bslib)
 library(shinyStore)
-
-
 #####timeout#######
 timeoutSeconds <- 60*10
 
@@ -24,7 +22,7 @@ Shiny.setInputValue('timeOut', '%ss')
 
 function resetTimer() {
 clearTimeout(t);
-t = setTimeout(logout, %s);  // time is in milliseconds (1000 is 1 second)
+t = setTimeout(logout, %s);  
 }
 }
 idleTimer();", timeoutSeconds*1000, timeoutSeconds, timeoutSeconds*1000)
